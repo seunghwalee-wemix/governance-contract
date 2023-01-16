@@ -7,13 +7,9 @@ require("dotenv").config();
 
 const path = require("path");
 
-const sendTx = require("./scripts/sendTx_task").sendTxKeep;
-const setting = require("./scripts/setting_task").set;
-const changeEnv = require("./scripts/changeEnv_task").changeEnvVal;
 const deployGov = require("./scripts/deploy_task").deployGov;
-const deployTestGov = require("./scripts/deploy_test_task").deployGov;
-const deployLocalGov = require("./scripts/deploy_local_task").deployGov;
 const addMember = require("./scripts/addMembers_task").addMembers;
+const impersonateMember = require('./scripts/impersonateNode').impersonateMember;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -38,65 +34,19 @@ task("addMember", "Add governance members")
 .setAction(async (taskArgs, hre)=>{
     await addMember(hre, taskArgs.pw, taskArgs.addr, taskArgs.acc, taskArgs.conf);
 })
-task("deployGovTest", "Deploy governance contracts")
-.addParam("pw").setAction(async (taskArgs, hre)=>{
-    await deployTestGov(hre, taskArgs.pw);
-})
 
-task("deployLocalTest", "Deploy governance contracts").addParam("conf")
+task("impMember", "Impersonante new gov member and stake")
+.addParam("gov")
+.addParam("addr")
 .setAction(async (taskArgs, hre)=>{
-    await deployLocalGov(hre, taskArgs.conf);
+    await impersonateMember(hre, taskArgs.gov, taskArgs.addr);
 })
-task("changeMP", "Change maxPrioirtyFeePerGas")
-    .addParam("pw")
-    .addParam("envValue")
-    .setAction(async (args, hre) => {
-        let envName = "maxPriorityFeePerGas";
-
-        let envTypes = ["uint256"];
-        let envValue = [args.envValue];
-        envMsg = "mp test";
-        // console.log(envName, types, envValue, msg)
-        const sets = await setting(hre, args.pw);
-        await changeEnv(hre, sets, envName, envTypes, envValue, envMsg);
-    });
-
-task("changeFee", "Change gasLimitAndBaseFee")
-    .addParam("pw")
-    .addParam("gasLimit")
-    .addParam("changeRate")
-    .addParam("targetPerc")
-    .addParam("maxBasefee")
-    .setAction(async (args, hre) => {
-        let envName = "gasLimitAndBaseFee";
-
-        let envTypes = ["uint256", "uint256", "uint256", "uint256"];
-        let envValue = [args.gasLimit, args.changeRate, args.targetPerc, args.maxBasefee + "0".repeat(9)];
-        envMsg = "mp test";
-        // console.log(envName, types, envValue, msg)
-        const sets = await setting(hre, args.pw);
-        await changeEnv(hre, sets, envName, envTypes, envValue, envMsg);
-    });
-
-task("sendTx", "send tx")
-    .addParam("pw")
-    .addParam("fromIdx")
-    .addParam("toIdx")
-    .addParam("value")
-    .setAction(async (args, hre) => {
-        const sets = await setting(hre, args.pw);
-        await sendTx(hre, sets, args.fromIdx, args.toIdx, args.value);
-    });
-
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-
-const privateKey = process.env.SK;
-const rpcURL = process.env.rpc;
 
 module.exports = {
     networks: {
@@ -114,8 +64,8 @@ module.exports = {
         localhost: {
             url: "http://127.0.0.1:8545",
         },
-        rpc:{
-            url: rpcURL
+        wemix:{
+            url: "https://api.wemix.com"
         }
     },
     contractSizer: {
