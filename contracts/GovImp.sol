@@ -47,6 +47,8 @@ contract GovImp is
     event NotApplicable(uint256 indexed ballotId, string reason);
 
     event SetProposalTimePeriod(uint256 newPeriod);
+    // added for announced that migration gov data
+    event GovDataMigrated(address indexed from);
 
     struct MemberInfo {
         address staker;
@@ -1305,5 +1307,6 @@ contract GovImp is
 
         modifiedBlock = oldModifiedBlock;
         transferOwnership(oldOwner);
+        emit GovDataMigrated(msg.sender);
     }
 }
