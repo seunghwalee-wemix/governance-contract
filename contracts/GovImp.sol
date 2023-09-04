@@ -1283,6 +1283,8 @@ contract GovImp is
         nodeToMember[id] = staker;
         nodeLength = id;
         lastAddProposalTime[staker] = stakerLastAddProposalTime;
+
+        emit MemberAdded(staker, voter);
     }
 
     function setBallotForMigration(
