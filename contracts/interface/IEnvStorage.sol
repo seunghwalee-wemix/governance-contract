@@ -18,6 +18,7 @@ interface IEnvStorage {
     function setMaxBaseFeeByBytes(bytes memory _value ) external;
     function setBallotDurationMinMaxByBytes(bytes memory _value ) external;
     function setStakingMinMaxByBytes(bytes memory _value ) external;
+    function setMaxUserDepositRateByBytes(bytes memory _value ) external;
     function getBlockCreationTime() external view returns (uint256);
     function getBlockRewardAmount() external view returns (uint256);
     function getMaxPriorityFeePerGas() external view returns (uint256);
@@ -32,6 +33,7 @@ interface IEnvStorage {
     function getBallotDurationMax() external view returns (uint256);
     function getBallotDurationMinMax() external view returns (uint256, uint256);
     function getMaxIdleBlockInterval() external view returns (uint256);
+    function getMaxUserDepositRate() external view returns (uint256);
     function checkVariableCondition(bytes32 envKey, bytes memory envVal) external pure returns(bool);
     function setVariable(bytes32 envKey, bytes memory envVal) external;
 }

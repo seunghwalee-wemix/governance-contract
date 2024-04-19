@@ -178,6 +178,10 @@ contract EnvStorageImp is AEnvStorage, EnvConstants, UUPSUpgradeable, IEnvStorag
         );
     }
 
+    function getMaxUserDepositRate() public override view returns (uint256) {
+        return getUint(MAX_USER_DEPOSIT_RATE_NAME);
+    }
+
     // function getStakingRewardAddress() public override view returns(address){
     //     return getAddress(STAKING_REWARD_ADDRESS_NAME);
     // }
@@ -293,6 +297,14 @@ contract EnvStorageImp is AEnvStorage, EnvConstants, UUPSUpgradeable, IEnvStorag
         setGasLimitAndBaseFee( _block_GasLimit, _baseFeeMaxChangeRate, _gasTargetPercentage, _maxBaseFee);
     }
 
+    function setMaxUserDepositRateByBytes(bytes memory _value )  public override onlyGov {
+        setMaxUserDepositRate(toUint(_value));
+    }
+
+    function setMaxUserDepositRate(uint256 _value) public onlyGov {
+        setUint(MAX_USER_DEPOSIT_RATE_NAME, _value);
+    }
+
     function checkVariableCondition(bytes32 envKey, bytes memory envVal) external pure override returns(bool){
 
         if(envKey == BLOCK_REWARD_DISTRIBUTION_METHOD_NAME){
@@ -343,7 +355,9 @@ contract EnvStorageImp is AEnvStorage, EnvConstants, UUPSUpgradeable, IEnvStorag
             setGasLimitAndBaseFeeByBytes(envVal);
         } else if (envKey == MAX_BASE_FEE_NAME) {
             setMaxBaseFeeByBytes(envVal);
-        } 
+        } else if (envKey == MAX_USER_DEPOSIT_RATE_NAME) {
+            setMaxUserDepositRateByBytes(envVal);
+        }
     }
 
     function toBytes32(bytes memory _input) internal pure returns (bytes32 _output) {
@@ -402,5 +416,6 @@ contract EnvStorageImp is AEnvStorage, EnvConstants, UUPSUpgradeable, IEnvStorag
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[49] private __gap;
+    bytes32 public constant MAX_USER_DEPOSIT_RATE_NAME = keccak256("maxUserDepositRate");
+    uint256[48] private __gap;
 }

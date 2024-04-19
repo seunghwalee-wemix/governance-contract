@@ -337,12 +337,19 @@ contract StakingImp is GovChecker, UUPSUpgradeable, ReentrancyGuardUpgradeable, 
      * @dev Deposit from a user for delegate staking.
      */
     function delegateDepositAndLockMore(address ncp) external payable override nonReentrant notRevoked onlyNCPStaking {
+        uint256 userDepositValue = msg.value;
         require(msg.value > 0, "Deposit amount should be greater than zero");
         require(IGov(getGovAddress()).isMember(ncp), "NCP should be a member");
 
-        // console.log("delegateDepositAndLockMore: msg.value: %s",ncp);
+        uint256 maximum_user_deposit_rate = IEnvStorage(getEnvStorageAddress()).getMaxUserDepositRate();
+        uint256 ncpLockedBalance = _lockedBalance[ncp] - _lockedUserBalanceToNCPTotal[ncp]; // _lockedBalance = ncp + ncp user
 
-        uint256 userDepositValue = msg.value;
+        // check active max deposit rate
+        if (maximum_user_deposit_rate != 0) {
+            // check userDepositValue
+            require(_lockedUserBalanceToNCPTotal[ncp] + userDepositValue <= ncpLockedBalance * maximum_user_deposit_rate, "user should be in max deposit range");
+        }
+
         //added value to ncp balance
         _balance[ncp] = _balance[ncp] + userDepositValue;
 
